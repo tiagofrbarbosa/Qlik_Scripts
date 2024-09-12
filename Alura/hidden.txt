@@ -1,0 +1,20 @@
+TAG FIELD ID_Produto WITH '$hidden';
+TAG FIELD ID_Vendedor WITH '$hidden';
+TAG FIELD ID_Cliente WITH '$hidden';
+TAG FIELD ID_Tempo WITH '$hidden';
+TAG FIELD ID_Fabrica WITH '$hidden';
+
+TAG FIELD Cod_Produto WITH '$hidden';
+TAG FIELD Cod_Vendedor WITH '$hidden';
+TAG FIELD Cod_Cliente WITH '$hidden';
+TAG FIELD Cod_Tempo WITH '$hidden';
+TAG FIELD Cod_Fabrica WITH '$hidden';
+
+TAG FIELD Cod_Marca WITH '$hidden';
+TAG FIELD Cod_Categorica WITH '$hidden';
+TAG FIELD Cod_Cidade WITH '$hidden';
+TAG FIELD Cod_Estado WITH '$hidden';
+TAG FIELD Cod_Regiao WITH '$hidden';
+TAG FIELD Cod_Segmento WITH '$hidden';
+TAG FIELD Cod_Gerente WITH '$hidden';
+TAG FIELD Cod_Diretor WITH '$hidden';

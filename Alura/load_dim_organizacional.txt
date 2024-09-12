@@ -1,0 +1,11 @@
+LOAD
+    ID_Vendedor,
+    Cod_Vendedor,
+    Desc_Vendedor,
+    Cod_Gerente,
+    Desc_Gerente,
+    Cod_Diretor,
+    Desc_Diretor 
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/dim_organizacional.csv]
+(txt, codepage is 28591, embedded labels, delimiter is ';', msq);
+

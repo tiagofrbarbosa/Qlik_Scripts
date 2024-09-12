@@ -1,0 +1,62 @@
+/*[Paises1]:
+LOAD * Inline
+[
+codigo_pais,nome_pais_1
+001,Brasil
+002,Argentina
+003,Colombia
+004,Alemanha
+005,Inglaterra
+006,França
+];
+
+//Outer Join (Paises1)
+//Left Join (Paises1)
+//Right Join (Paises1)
+Inner Join (Paises1)
+LOAD * Inline
+[
+codigo_pais,nome_pais_2
+001,Brasil
+002,Argentina
+003,Colombia
+007,Portugal
+008,Espanha
+009,Holanda
+];
+*/
+
+[Paises1]:
+LOAD * Inline
+[
+codigo_pais,nome_pais_1
+001,Brasil
+002,Argentina
+003,Colombia
+004,Alemanha
+005,Inglaterra
+006,França
+];
+
+//Outer Join (Paises1)
+//Left Join (Paises1)
+//Right Join (Paises1)
+Inner Join (Paises1)
+LOAD * Inline
+[
+codigo_pais,valor
+001,10
+002,10
+003,10
+001,10
+002,10
+003,10
+];
+
+
+[PaisesTotal]:
+LOAD codigo_pais, SUM(valor) as valor
+Resident [Paises1]
+GROUP BY codigo_pais;
+
+DROP Table Paises1;

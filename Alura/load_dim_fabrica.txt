@@ -1,0 +1,7 @@
+[DIM_FABRICA]:
+Load * Inline [
+ID_Fabrica, Cod_Fabrica, Desc_Fabrica
+1,001, Fabrica Rio de Janeiro
+2,002, Fabrica de São Paulo
+3,003, Fabrica Minas Gerais
+];

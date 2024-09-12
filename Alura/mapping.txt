@@ -1,0 +1,40 @@
+[ShipCountryMapping]:
+MAPPING LOAD * Inline
+[
+ShipCountryMapping-FROM,ShipCountryMapping-TO
+Brazil,Brasil
+];
+
+
+LOAD
+    OrderID,
+    CustomerID AS CustomerID2,
+    EmployeeID as CustomerID,
+    OrderDate,
+    RequiredDate,
+    ShippedDate,
+    ShipVia,
+    Freight,
+    ShipName,
+    ShipAddress,
+    ShipCity,
+    if (IsNull(ShipRegion), 'ND', ShipRegion) as ShipRegion,
+    ShipPostalCode,
+    ApplyMap('ShipCountryMapping', ShipCountry) AS ShipCountry
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/Orders.xlsx]
+(ooxml, embedded labels, table is Orders);
+
+LOAD
+    CustomerID,
+    CompanyName,
+    ContactName,
+    ContactTitle,
+    Address,
+    City,
+    Region,
+    PostalCode,
+    Country,
+    Phone,
+    Fax
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/Customers.txt]
+(txt, utf8, embedded labels, delimiter is ';', msq);

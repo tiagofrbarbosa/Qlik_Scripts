@@ -1,0 +1,22 @@
+Fonte1:
+LOAD * Inline [
+codigo,nome
+001,João
+002,Pedro
+003,Alberto
+];
+
+Concatenate(Fonte1)
+LOAD * Inline [
+codigo,nome2
+004,Joana
+005,Pedrita
+006,Albertina
+];
+
+NoConcatenate
+Fonte3:
+LOAD * Resident Fonte1
+WHERE codigo = '01' or codigo = '04';
+
+DROP TABLE Fonte1;

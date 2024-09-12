@@ -1,0 +1,63 @@
+[Orders]:
+LOAD
+    "Order ID",
+    Employee,
+    Customer,
+    "Order Date",
+    "Shipped Date",
+    Amount
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/Canonical Date.xlsx]
+(ooxml, embedded labels, table is Orders);
+
+[Invoice]:
+LOAD
+    "Order ID",
+    "Invoice Date",
+    "Invoice Amt"
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/Canonical Date.xlsx]
+(ooxml, embedded labels, table is Invoice);
+
+DatasUnidas:
+LOAD "Order ID"
+, "Order Date" as "Cannonic Dates"
+, 'Order' as Fonte
+Resident Orders;
+Concatenate
+LOAD "Order ID"
+, "Shipped Date" as "Cannonic Dates"
+, 'Shipped' as Fonte
+Resident Orders;
+Concatenate
+LOAD "Order ID"
+, "Invoice Date" as "Cannonic Dates"
+, 'Invoice' as Fonte
+Resident Invoice;
+
+CannonicDates:
+LOAD Distinct "Cannonic Dates"
+, MonthName("Cannonic Dates") AS "Cannonic Month"
+, Year("Cannonic Dates") AS "Cannonic Year"
+, Week("Cannonic Dates") AS "Cannonic Week"
+Resident DatasUnidas;
+
+
+// [ShippedCalendar]:
+// LOAD DISTINCT "Shipped Date"
+// , MonthName("Shipped Date") AS "Shipped Month"
+// , Year("Shipped Date") AS "Shipped Year"
+// , Week("Shipped Date") AS "Shipped Week"
+// Resident Orders;
+
+// [OrderCalendar]:
+// LOAD DISTINCT "Order Date" 
+// , MonthName("Order Date") AS "Order Month"
+// , Year("Order Date") AS "Order Year"
+// , Week("Order Date") AS "Order Week"
+// Resident Orders;
+
+// [InvoiceCalendar]:
+// LOAD DISTINCT "Invoice Date" 
+// , MonthName("Invoice Date") AS "Invoice Month"
+// , Year("Invoice Date") AS "Invoice Year"
+// , Week("Invoice Date") AS "Invoice Week"
+// Resident Invoice;

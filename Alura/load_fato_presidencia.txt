@@ -1,0 +1,19 @@
+LOAD
+    ID_Tempo,
+    ID_Fabrica,
+    ID_Vendedor,
+    ID_Cliente,
+    ID_Produto,
+    Faturamento as [Faturamento em R$],
+    Unidade_Vendida as [Unidade Vendida],
+    Quantidade_Vendida as [Quantidade Vendida em Litros],
+    Imposto,
+    Custo_Variavel,
+    Custo_Frete,
+    Custo_Fixo,
+    Meta_Faturamento,
+    Meta_Custo
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/fato_presidencia.csv]
+(txt, codepage is 28591, embedded labels, delimiter is ';', msq);
+
+

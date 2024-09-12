@@ -1,0 +1,20 @@
+[DIM_PRODUTO]:
+LOAD
+    id as ID_Produto,
+    SKU as Cod_Produto,
+    DESCRITOR as Desc_Produto,
+    Subfield(DESCRITOR, ' - ',1) as Cod_Marca,
+    Subfield(DESCRITOR, ' - ',2) as Atr_Tamanho,
+    Subfield(DESCRITOR, ' - ',3) as Atr_Sabor
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/PRODUTOS.xlsx]
+(ooxml, embedded labels, table is Sheet1);
+inner join([DIM_PRODUTO])
+LOAD
+    MARCA as Cod_Marca,
+    MARCA as Desc_Marca,
+    CATEGORIA as Cod_Categoria,
+    CATEGORIA as Desc_Categoria
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/MARCAS E CATEGORIAS 2.csv]
+(txt, utf8, embedded labels, delimiter is ';', msq);
+​
+​

@@ -1,0 +1,20 @@
+[DIM_CLIENTE]:
+LOAD
+    ID_CLIENTE as ID_Cliente,
+    COD_CLIENTE as Cod_Cliente,
+    CLIENTE as Desc_Cliente,
+    SUBFIELD(ENDERECO, ' - ', 2) as Cod_Cidade,
+    SUBFIELD(ENDERECO, ' - ', 2) as Desc_Cidade,
+    SUBFIELD(ENDERECO, ' - ', 3) as Cod_Estado,
+    SEGMENTO as Cod_Segmento,
+    SEGMENTO as Desc_Segmento
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/CADASTRO DE CLIENTES.xlsx]
+(ooxml, embedded labels, table is CLIENTES);
+Inner Join([DIM_CLIENTE])
+LOAD
+    "ESTADO ABREVIAÇÃO" as Cod_Estado,
+    ESTADO as Desc_Estado,
+    REGIAO as Cod_Regiao,
+    REGIAO as Desc_Regiao
+FROM [lib://Qlik-Manipulando-Dados:DataFiles/REGIOES DOS ESTADOS 2.csv]
+(txt, utf8, embedded labels, delimiter is ';', msq);
