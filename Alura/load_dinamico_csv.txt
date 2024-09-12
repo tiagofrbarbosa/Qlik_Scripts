@@ -1,0 +1,87 @@
+SET ThousandSep=',';
+SET DecimalSep='.';
+SET MoneyThousandSep=',';
+SET MoneyDecimalSep='.';
+SET MoneyFormat='$ ###0.00;-$ ###0.00';
+SET TimeFormat='h:mm:ss TT';
+SET DateFormat='M/D/YYYY';
+SET TimestampFormat='M/D/YYYY h:mm:ss[.fff] TT';
+SET FirstWeekDay=6;
+SET BrokenWeeks=1;
+SET ReferenceDay=0;
+SET FirstMonthOfYear=1;
+SET CollationLocale='en-US';
+SET CreateSearchIndexOnReload=1;
+SET MonthNames='Jan;Feb;Mar;Apr;May;Jun;Jul;Aug;Sep;Oct;Nov;Dec';
+SET LongMonthNames='January;February;March;April;May;June;July;August;September;October;November;December';
+SET DayNames='Mon;Tue;Wed;Thu;Fri;Sat;Sun';
+SET LongDayNames='Monday;Tuesday;Wednesday;Thursday;Friday;Saturday;Sunday';
+SET NumericalAbbreviation='3:k;6:M;9:G;12:T;15:P;18:E;21:Z;24:Y;-3:m;-6:μ;-9:n;-12:p;-15:f;-18:a;-21:z;-24:y';
+
+Let v_diretorio_CSV = 'lib://Qlik-Manipulando-Dados:DataFiles';
+
+For Each v_CSVArquivos in FileList('$(v_diretorio_CSV)/*.CSV')
+	//Trace $(v_CSVArquivos);
+    [temp_lista_arquivos]:
+    	Load 
+        	'$(v_CSVArquivos)' as arquivo_nome_full
+            
+            ,SubField('$(v_CSVArquivos)','/',4) as nome_arquivo
+            
+            ,SubField(SubField('$(v_CSVArquivos)','/',4),'_',2) 
+            & SubField(SubField('$(v_CSVArquivos)','/',4),'_',3) as mes_ano
+            
+            ,SubField(SubField('$(v_CSVArquivos)','/',4),'_',2) 
+            & Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','') as mes_ano2
+            
+            ,Num#(Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) as num_mes
+            
+            ,if(Num#(Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) <= 9,
+            '0' & Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV',''),
+            Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) as num_mes_zero
+            
+            ,SubField(SubField('$(v_CSVArquivos)','/',4),'_',2) &
+            if(Num#(Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) <= 9,
+            '0' & Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV',''),
+            Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) as mes_ano_final
+            
+            ,Date(Date#(SubField(SubField('$(v_CSVArquivos)','/',4),'_',2) &
+            if(Num#(Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')) <= 9,
+            '0' & Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV',''),
+            Replace(SubField(SubField('$(v_CSVArquivos)','/',4),'_',3),'.CSV','')),'YYYYMM')) as data_calendario
+            
+            AutoGenerate 1;
+Next v_CSVArquivos
+
+temp:
+	Load Date(max(data_calendario)) as max_data
+    ,AddMonths(Date(max(data_calendario)),-11) as min_data
+    Resident temp_lista_arquivos;
+    
+    Let v_max = Peek('max_data');
+    Let v_min = Peek('min_data');
+
+NoConcatenate
+final_lista_arquivos:
+	Load * Resident temp_lista_arquivos where data_calendario >= '$(v_min)'
+    	and data_calendario <= '$(v_max)';
+        
+Drop Table temp_lista_arquivos;
+
+For v_arquivo = 1 to NoOfRows('final_lista_arquivos')
+	Let v_arquivo_nome_carga = Peek('arquivo_nome_full',v_arquivo - 1, 'final_lista_arquivos');
+    Trace '$(v_arquivo_nome_carga)';
+    
+LOAD
+    cpf,
+    data_venda,
+    matricula,
+    codigo_do_produto,
+    quantidade,
+    faturamento
+FROM [$(v_arquivo_nome_carga)]
+(txt, utf8, embedded labels, delimiter is ';', msq);
+
+Next v_arquivo
+
+Drop Table final_lista_arquivos;
