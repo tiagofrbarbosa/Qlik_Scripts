@@ -1,0 +1,144 @@
+SET vPathQVD = 'lib://DataFiles/';
+
+//===================================================
+// Rotina para geracao de calendario. 
+//===================================================
+
+SUB CalendarFromField(_field, _calendar, _prefix)
+
+	[$(_calendar)]:
+	// Generate Final Calendar
+	LOAD
+		[$(_field)],
+		year([$(_field)]) 								as [$(_prefix)Ano],
+		month([$(_field)]) 								as [$(_prefix)Mes],
+		date(monthstart([$(_field)]),'MMM/YYYY') 		as [$(_prefix)AnoMes],
+		day([$(_field)]) 								as [$(_prefix)Dia],
+		weekday([$(_field)]) 							as [$(_prefix)DiaSemana];
+	// Generate range of dates between min and max.
+	
+	LOAD
+		date(DateMin + IterNo()) 						as [$(_field)]		// Link Field
+	WHILE DateMin + IterNo() <= DateMax;
+	// Find min and max of date field values.
+	LOAD
+		min(datefield)-1 								as DateMin,
+		max(datefield) 									as DateMax;
+		
+	// Load date field values.
+	LOAD 
+		FieldValue('$(_field)', RecNo()) 				as datefield
+	AutoGenerate FieldValueCount('$(_field)');	
+
+END SUB
+
+
+[Venda]:
+LOAD 
+	 OrderID as NumeroVenda, 
+     CustomerID as ClienteId, 
+     EmployeeID as VendedorId, 
+     addyears(OrderDate,20)    as DataVenda, 
+     addyears(RequiredDate,20) as DataPedido, 
+     addyears(ShippedDate,20) as DataEntrega, 
+     ShipVia 												as FormaEntrega, 
+     Freight               as Peso, 
+     ShipName              as NomeEnvio, 
+     ShipAddress           as EnderecoEntrega, 
+     ShipCity             as CidadeEntrega, 
+     ShipRegion              as RegiaoEntrega, 
+     ShipPostalCode          as CodigoPostalEntrega, 
+     ShipCountry          as PaisEntrega
+FROM [$(vPathQVD)Orders.qvd] (qvd);
+
+
+[ItemVenda]:
+LOAD 
+	 OrderID as NumeroVenda, 
+     ProductID as ProdutoId,
+     UnitPrice/100  as PrecoUnitario, 
+     Quantity as Quantidade, 
+     num(replace(Discount,',','.')) as Desconto,
+     (UnitPrice/100) * Quantity * (1-num(replace(Discount,',','.')))					as ValorVenda
+FROM [$(vPathQVD)OrderDetails.qvd] (qvd);
+
+[Produto]:
+LOAD 
+	 ProductID   as ProdutoId, 
+     ProductName   as ProdutoNome, 
+     SupplierID as FornecedorId, 
+     CategoryID   as CategoriaId, 
+     QuantityPerUnit  as QuantidadeUnitariaTabela, 
+     UnitPrice 	as PrecoUnitarioTabela, 
+     UnitsInStock   as UnidadesEstoque, 
+     UnitsOnOrder   as UnidadesVendidas, 
+     ReorderLevel   as NivelDevolucao, 
+     Discontinued  as Descontinuado
+FROM [$(vPathQVD)Products.qvd] (qvd);
+
+[Categoria]:
+LOAD 
+	 CategoryID  as CategoriaId, 
+     CategoryName  as CategoriaNome, 
+     Description   as CategoriaDescricao, 
+     Picture as Figura
+FROM [$(vPathQVD)Categories.qvd] (qvd);
+
+
+[Fornecedor]:
+LOAD 
+	 SupplierID                          as FornecedorId, 
+     CompanyName 							as FornecedorNome, 
+     ContactName 							as FornecedorContato, 
+     ContactTitle 							as FornecedorContatoTitulo, 
+     Address 								as FornecedorEndereco, 
+     City 									as FornecedorCidade, 
+     Region 								as FornecedorRegiao, 
+     PostalCode 							as FornecedorCodigoPostal, 
+     Country 								as FornecedorPais, 
+     Phone 									as FornecedorTelefone, 
+     Fax 									as FornecedorFax, 
+     HomePage 								as FornecedorHomePage
+FROM [$(vPathQVD)Suppliers.qvd] (qvd);
+
+[Vendedor]:
+LOAD 
+	 EmployeeID as VendedorId, 
+     LastName 								as VendedorSobreNome, 
+     FirstName 								as VnededorNome, 
+     Title 									as VendedorTitulo, 
+     TitleOfCourtesy 						as VendedorTituloCortesia, 
+     BirthDate 								as VendedorDataNascimento, 
+     HireDate 								as VendedorDataContratacao, 
+     Address 								as VendedorEndereco, 
+     City 									as VendedorCidade, 
+     Region 								as VendedorRegiao, 
+     PostalCode 							as VendedorCodigoPostal, 
+     Country 								as VnededorPais, 
+     HomePhone 								as VendedorTelefone, 
+     Extension 								as VendedorRamal, 
+     Photo 									as VendedorFoto, 
+     Notes 									as VendedorObservacao, 
+     ReportsTo 								as VendedorReportaA, 
+     PhotoPath 								as VendedorFotoLocalizacao
+FROM [$(vPathQVD)Employees.qvd] (qvd);
+
+[Cliente]:
+LOAD 
+	 CustomerID  as ClienteId, 
+     CompanyName  as ClienteNome, 
+     ContactName   as ClienteContato, 
+     ContactTitle  as ClienteContatoTitulo, 
+     Address  as ClienteEndereco, 
+     City  as ClienteCidade, 
+     Region  as ClienteRegiao, 
+     PostalCode as ClienteCodigoPostal, 
+     Country as ClientePais, 
+     Phone as ClienteTelefone, 
+     Fax as ClienteFax
+FROM [$(vPathQVD)Customers.qvd] (qvd);
+
+
+CALL CalendarFromField('DataVenda', 'VendaCalendario', 'Venda');
+CALL CalendarFromField('DataPedido', 'PedidoCalendario', 'Pedido');
+CALL CalendarFromField('DataEntrega', 'EntregaCalendario', 'Entrega');
